@@ -1,0 +1,68 @@
+import pandas as pd
+import numpy as np
+import datetime
+import matplotlib
+import matplotlib.pyplot as plt
+import seaborn as sns
+matplotlib.style.use('ggplot')
+import calendar
+from google.colab import drive
+from google.colab import drive
+drive.mount("/content/gdrive")
+data=pd.read_csv('/content/gdrive/My Drive/Data sets/My Uber Drives - 2016.csv')
+data.head()
+data.tail()
+data = data[:-1]
+def convert_time(column_name):
+    y=[]
+    for x in data[column_name]:
+        y.append(datetime.datetime.strptime(x, "%m/%d/%Y %H:%M"))
+
+    data[column_name] = y
+column_date=data[['START_DATE*','END_DATE*']] 
+for x in column_date:
+    convert_time(x)
+data.info()
+x = data['CATEGORY*'].value_counts().plot(kind='bar')
+count = 0
+month=[]
+while count < len(data):
+    month.append(data['START_DATE*'][count].month)
+    count = count+1
+data['Month'] = month
+minutes=[]
+data['Duration_Minutes'] = data['END_DATE*'] - data['START_DATE*']
+data['Duration_Minutes']
+for x in data['Duration_Minutes']:
+    minutes.append(x.seconds / 60)
+
+data['Duration_Minutes'] = minutes
+x = data['Month'].value_counts()
+x.plot(kind='bar',figsize=(10,5),color='orange')
+plt.xlabel('Month')
+plt.ylabel('Frequency')
+plt.title('Per month of the year')
+count = 0
+week=[]
+while count < len(data):
+    week.append(data['START_DATE*'][count].week)
+    count = count+1
+data['Week'] = week
+x = data['Week'].value_counts()
+x.plot(kind='bar',figsize=(10,5),color='orange')
+plt.xlabel('Week')
+plt.ylabel('Frequency')
+plt.title('Per day of the week')
+hours = data['START_DATE*'].dt.hour.value_counts()
+hours.plot(kind='bar',color='orange',figsize=(10,5))
+plt.xlabel('Hours')
+plt.ylabel('Frequency')
+plt.title('Per hour of the day')
+data['Duration_hours'] = data['Duration_Minutes'] / 60
+data['Speed_KM'] = data['MILES*'] / data['Duration_hours']
+data['Speed_KM']
+month = data['START_DATE*'].dt.month.value_counts()
+month.plot(kind='bar',color='orange',figsize=(10,5))
+plt.xlabel('Month')
+plt.ylabel('Frequency')
+plt.title('Month with highest trip')
